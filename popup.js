@@ -1,52 +1,37 @@
-const scriptSelect = document.getElementById("scriptSelect");
-const runBtn = document.getElementById("runBtn");
-const saveBtn = document.getElementById("saveBtn");
+const searchTextarea = document.getElementById("searchTextarea");
+const findBtn = document.getElementById("findBtn");
+const massClickBtn = document.getElementById("massClickBtn");
 
-// Load saved scripts
-chrome.storage.local.get("scripts", (data) => {
-  const scripts = data.scripts || {};
-  Object.keys(scripts).forEach((name) => {
-    const option = document.createElement("option");
-    option.value = name;
-    option.textContent = name;
-    scriptSelect.appendChild(option);
-  });
-});
-
-// Run selected script
-document.getElementById("runBtn").addEventListener("click", () => {
-  const selectedScript = scriptSelect.value;
-  if (!selectedScript) return;
-  chrome.storage.local.get("scripts", (data) => {
-    const scripts = data.scripts || {};
-    const script = scripts[selectedScript];
-    if (!script || !script.selector || !script.action) return;
+findBtn.addEventListener("click", () => {
+  try {
+    const searchText = searchTextarea.value.trim();
+    const searchTextList = searchText
+      .split(/[\r\n]+/)
+      .map((line) => line.trim().toLowerCase())
+      .filter((s) => s);
+    if (searchTextList.length === 0) {
+      alert("Please enter some text to search for.");
+      return;
+    }
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       chrome.tabs.sendMessage(tab.id, {
-        type: "RUN_SELECTOR_ACTION",
-        selector: script.selector,
-        action: script.action,
-        value: script.value,
+        type: "FIND_AND_HIGHLIGHT_TEXT",
+        searchTextList,
       });
     });
-  });
+  } catch (error) {
+    console.error("Error during search:", error);
+    alert(error.message || "An error occurred during the search.");
+  }
 });
 
-// Save new script
-saveBtn.addEventListener("click", () => {
-  const selector = document.getElementById("selector").value.trim();
-  const action = document.getElementById("action").value;
-  const value = document.getElementById("value").value;
-  if (!selector || !action) return;
-
-  chrome.storage.local.get("scripts", (data) => {
-    const scripts = data.scripts || {};
-    const scriptName = `${selector}-${action}-${value}`;
-    scripts[scriptName] = {
-      selector,
-      action,
-      value,
-    };
-    chrome.storage.local.set({ scripts }, () => location.reload());
-  });
+massClickBtn.addEventListener("click", () => {
+  try {
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      chrome.tabs.sendMessage(tab.id, { type: "MASS_CLICK_ELEMENTS" });
+    });
+  } catch (error) {
+    console.error("Error during mass click:", error);
+    alert(error.message || "An error occurred during the mass click.");
+  }
 });

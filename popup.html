@@ -6,28 +6,13 @@
 </head>
 <body>
   <section style="width:240px;padding:0 8px 4px">
-    <h2>Script Runner</h2>
-    <p>Select a script to run:</p>
-    <div style="display:flex">
-      <select id="scriptSelect" style="flex:auto;margin-right:4px"></select>
-      <button id="runBtn">Run</button>
-    </div>
-    <br />
-    <hr />
-    <h3>Add Custom Script</h3>
+    <h2>Search and Mass Click</h2>
+    <p style="margin-bottom:4px;">Find:</p>
     <div style="display:flex;flex-direction:column">
-      <input id="selector" placeholder="CSS Selector" style="margin-bottom:4px" />
-      <select id="action" style="margin-bottom:4px">
-        <option value="click">Click</option>
-        <option value="setText">Set Text</option>
-        <option value="setValue">Set Value</option>
-        <option value="highlight">Highlight</option>
-        <option value="scrollIntoView">Scroll to View</option>
-        <option value="remove">Remove</option>
-      </select>
-      <input id="value" placeholder="Optional value..." style="margin-bottom:4px" />
+      <textarea id="searchTextarea" style="flex:1;height:100px;margin-bottom:4px"></textarea>
+      <button id="findBtn" style="margin-bottom:4px;">Find</button>
+      <button id="massClickBtn">Mass Click</button>
     </div>
-    <button id="saveBtn">Save</button>
   </section>
   <script src="popup.js"></script>
   <script src="content.js"></script>
