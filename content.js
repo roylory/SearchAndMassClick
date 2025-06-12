@@ -1,5 +1,3 @@
-let matchedElements = [];
-
 const excludedTags = new Set([
   "SCRIPT",
   "STYLE",
@@ -10,8 +8,21 @@ const excludedTags = new Set([
   "TITLE",
 ]);
 
-function findAndHighlight(searchTextList) {
-  matchedElements = [...document.querySelectorAll("*")].filter((el) => {
+function findNearestCheckbox(startElement) {
+  let current = startElement;
+
+  while (current) {
+    const checkbox = current.querySelector('input[type="checkbox"]');
+    if (checkbox) return checkbox;
+
+    current = current.parentElement;
+  }
+
+  return null; // No checkbox found
+}
+
+function findAndMassClick(searchTextList) {
+  const matchedElements = [...document.querySelectorAll("*")].filter((el) => {
     if (excludedTags.has(el.tagName)) return false;
     if (getComputedStyle(el).display === "none") return false;
 
@@ -34,37 +45,33 @@ function findAndHighlight(searchTextList) {
     return;
   }
 
-  alert(
-    `Found ${matchedElements.length} elements containing the specified text.`
-  );
+  const checkboxElements = matchedElements
+    .map((el) => {
+      const checkbox = findNearestCheckbox(el);
+      if (checkbox) {
+        checkbox.checked = true; // Check the checkbox if found
+        return checkbox;
+      }
+      return null; // No checkbox found for this element
+    })
+    .filter(Boolean); // Filter out null values
+
+  alert(`Found ${checkboxElements.length} checkboxes near the specified text.`);
 
   matchedElements.forEach((el) => {
     el.style.backgroundColor = "yellow"; // Highlight found elements
-    el.scrollIntoView({ behavior: "smooth" }); // Scroll to the first found element
+  });
+
+  matchedElements[0].scrollIntoView({ behavior: "smooth" }); // Scroll to the first found element
+
+  checkboxElements.forEach((checkbox) => {
+    checkbox.style.boxShadow = "0 0 3px yellow"; // Highlight the checkbox
+    checkbox.click(); // Simulate a click on the checkbox
   });
 }
 
-function massClickElements() {
-  if (matchedElements.length === 0) {
-    alert("No elements to click. Please perform a search first.");
-    return;
-  }
-
-  matchedElements.forEach((el) => {
-    el.click(); // Simulate a click on each matched element
-  });
-
-  alert(`Clicked on ${matchedElements.length} elements.`);
-}
-
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.type === "FIND_AND_HIGHLIGHT_TEXT") {
-    findAndHighlight(msg.searchTextList);
-  }
-});
-
-chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.type === "MASS_CLICK_ELEMENTS") {
-    massClickElements();
+  if (msg.type === "FIND_AND_MASS_CLICK") {
+    findAndMassClick(msg.searchTextList);
   }
 });
