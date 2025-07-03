@@ -40,6 +40,13 @@ function findAndMassClick(searchTextList) {
     );
   });
 
+  // Copy the matched elements to clipboard
+  // TODO: Only copy Sabangnet Order Numbers
+  const textToCopy = matchedElements
+    .map((el) => el.textContent.trim())
+    .join("\n");
+  navigator.clipboard.writeText(textToCopy);
+
   if (matchedElements.length === 0) {
     alert("No elements found containing the specified text.");
     return;
