@@ -40,9 +40,11 @@ function findAndMassClick(searchTextList) {
     );
   });
 
-  // Copy the matched elements to clipboard
-  // TODO: Only copy Sabangnet Order Numbers
-  const textToCopy = matchedElements
+  // Copy the Sabangnet Order Number if found
+  const directChildDivs = matchedElements
+    .map((el) => el.querySelector(":scope > div"))
+    .filter(Boolean);
+  const textToCopy = directChildDivs
     .map((el) => el.textContent.trim())
     .join("\n");
   navigator.clipboard.writeText(textToCopy);
