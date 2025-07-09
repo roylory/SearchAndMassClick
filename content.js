@@ -94,8 +94,7 @@ function findAndMassClick(searchTextList) {
 
   if (copySuccess) {
     alert(
-      `Found ${checkboxElements.length} checkboxes near the specified text.
-      \nCopied Sabangnet Order Numbers to clipboard.`
+      `Found ${checkboxElements.length} checkboxes near the specified text. \nCopied Sabangnet Order Numbers to clipboard.`
     );
   } else {
     alert(
