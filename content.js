@@ -21,6 +21,30 @@ function findNearestCheckbox(startElement) {
   return null; // No checkbox found
 }
 
+function copyTextToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+
+  // Avoid scrolling to bottom
+  textArea.style.position = "fixed";
+  textArea.style.top = "-9999px";
+  textArea.style.left = "-9999px";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  let success = false;
+  try {
+    success = document.execCommand("copy");
+  } catch (err) {
+    console.error('document.execCommand("copy") failed:', err);
+  }
+
+  document.body.removeChild(textArea);
+  return success;
+}
+
 function findAndMassClick(searchTextList) {
   const matchedElements = [...document.querySelectorAll("*")].filter((el) => {
     if (excludedTags.has(el.tagName)) return false;
@@ -40,15 +64,6 @@ function findAndMassClick(searchTextList) {
     );
   });
 
-  // Copy the Sabangnet Order Number if found
-  const directChildDivs = matchedElements
-    .map((el) => el.querySelector(":scope > div"))
-    .filter(Boolean);
-  const textToCopy = directChildDivs
-    .map((el) => el.textContent.trim())
-    .join("\n");
-  navigator.clipboard.writeText(textToCopy);
-
   if (matchedElements.length === 0) {
     alert("No elements found containing the specified text.");
     return;
@@ -65,7 +80,28 @@ function findAndMassClick(searchTextList) {
     })
     .filter(Boolean); // Filter out null values
 
-  alert(`Found ${checkboxElements.length} checkboxes near the specified text.`);
+  // Copy the Sabangnet Order Number if found
+  let copySuccess = false;
+  const directChildDivs = matchedElements
+    .map((el) => el.querySelector(":scope > div"))
+    .filter(Boolean);
+  const textToCopy = directChildDivs
+    .map((el) => el.textContent.trim())
+    .join("\n");
+  if (textToCopy) {
+    copySuccess = copyTextToClipboard(textToCopy);
+  }
+
+  if (copySuccess) {
+    alert(
+      `Found ${checkboxElements.length} checkboxes near the specified text.
+      \nCopied Sabangnet Order Numbers to clipboard.`
+    );
+  } else {
+    alert(
+      `Found ${checkboxElements.length} checkboxes near the specified text.`
+    );
+  }
 
   matchedElements.forEach((el) => {
     el.style.backgroundColor = "yellow"; // Highlight found elements
