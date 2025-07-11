@@ -82,12 +82,10 @@ function findAndMassClick(searchTextList) {
 
   // Copy the Sabangnet Order Number if found
   let copySuccess = false;
-  const directChildDivs = matchedElements
-    .map((el) => el.querySelector(":scope > div"))
+  const nextSibling = matchedElements
+    .map((el) => (el.tagName === "DIV" ? el.nextElementSibling : null))
     .filter(Boolean);
-  const textToCopy = directChildDivs
-    .map((el) => el.textContent.trim())
-    .join("\n");
+  const textToCopy = nextSibling.map((el) => el.textContent.trim()).join("\n");
   if (textToCopy) {
     copySuccess = copyTextToClipboard(textToCopy);
   }
